@@ -26,12 +26,14 @@ extension WP_Error: LocalizedError {
 public typealias SessionPurchase = (sessionId: String, currentSubscription: PaidSubscription?)
 
 final public class WWAStoreKit {
-    static var shared: WWAStoreKit = WWAStoreKit()
+    public static var shared: WWAStoreKit = WWAStoreKit()
     public var appstoreSecret: String!
     public var products: [SKProduct] = []
+    
     private var sessions = [SessionId: Session]()
     private var sessionPurchase: SessionPurchase? = nil
     private let simulatedStartDate: Date
+    
     public func isActivePaidSubscription() -> Bool { // avoid to this class calling when the first time init
         if let sessionPurchase = self.sessionPurchase {
             if let paid = sessionPurchase.currentSubscription, // already paid ?
@@ -105,12 +107,12 @@ final public class WWAStoreKit {
     }
     
     @discardableResult
-    func restore(appstoreSecret: String) -> Promise<SessionPurchase> {
+    public func restore() -> Promise<SessionPurchase> {
         return self.fetchReceiption()
     }
     
     @discardableResult
-    func purchase(skProduct: SKProduct, appstoreSecret: String) -> Promise<PurchaseDetails> {
+    public func purchase(skProduct: SKProduct) -> Promise<PurchaseDetails> {
         return Promise { seal in
             SwiftyStoreKit.purchaseProduct(skProduct, quantity: 1, atomically: true, completion: { (result) in
                 switch result {
@@ -142,9 +144,10 @@ final public class WWAStoreKit {
                     let wp_error = WP_Error(msg: strError)
                     seal.reject(wp_error)
                     break
-                case .deferred(purchase: let _):
+                default:
                     let wp_error = WP_Error(msg: "Waiting For Approval")
                     seal.reject(wp_error)
+                    break
                 }
             })
         }
@@ -244,10 +247,11 @@ final public class WWAStoreKit {
         }
         
     }
-    func restorePurchases() {
+    public func restorePurchases() {
         SKPaymentQueue.default().restoreCompletedTransactions()
     }
-    @objc func setupIAP() {
+    
+    public func setupIAP() {
         SwiftyStoreKit.completeTransactions(atomically: true) { purchases in
             for purchase in purchases {
                 switch purchase.transaction.transactionState {
@@ -293,9 +297,7 @@ final public class WWAStoreKit {
             return nil
         }
     }
-    
-    // MARK: Private
-    private func getSubscription() -> PaidSubscription? {
+    public func getSubscription() -> PaidSubscription? {
         guard let subscription = UserDefaults.standard.object(forKey: k_subscription) as? Data else{
             return nil
         }
@@ -306,6 +308,8 @@ final public class WWAStoreKit {
         UserDefaults.standard.set(subscription.encode(), forKey: k_subscription)
         UserDefaults.standard.synchronize()
     }
+    // MARK: Private
+    
     
     private func isRunningInTestFlightEnvironment() -> Bool {
          if isSimulator() {
