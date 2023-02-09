@@ -1,0 +1,32 @@
+{
+  "pins" : [
+    {
+      "identity" : "promisekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mxcl/PromiseKit.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "2ed400300d2d09beedab097d3ab020c10902b0c5"
+      }
+    },
+    {
+      "identity" : "swiftdate",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/malcommac/SwiftDate.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "5d943224c3bb173e6ecf27295611615eba90c80e"
+      }
+    },
+    {
+      "identity" : "swiftystorekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/bizz84/SwiftyStoreKit.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "9f9627f2a382ef2154991c87210acb120402af45"
+      }
+    }
+  ],
+  "version" : 2
+}
